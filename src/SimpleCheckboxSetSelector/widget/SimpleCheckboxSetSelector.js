@@ -40,6 +40,7 @@ define([
             readonly: false,
             onChangeMicroflow: "",
             sortOnChecked: true,
+            itemsPerColumn: 5,
 
             // Internal variables. Non-primitives created in the prototype are shared between all widget instances.
             _direction: "vertical",
@@ -74,6 +75,10 @@ define([
 
                 if (this.sortAttr === "") {
                     this.sortAttr = this.displayAttribute;
+                }
+
+                if (this.itemsPerColumn === 0) {
+                    this.itemsPerColumn = 99999;
                 }
 
                 // adjust the template based on the display settings.
@@ -319,12 +324,15 @@ define([
                 var mxObj = null,
                     i = 0,
                     j = 0,
+                    itemIndex = 0, 
+                    colIndex = 0,
+                    itemIndex = 0,
                     labelNode = null,
                     checkboxNode = null,
                     enclosingDivElement = null,
+                    columnWrapperDiv = null,
                     nodelength = 0;
 
-                nodelength = this.checkboxComboContainer.children.length;
                 this._checkboxesArr = [];
 
                 if (this.direction === "horizontal") {
@@ -347,28 +355,58 @@ define([
                             dojoConstruct.place(labelNode, this.checkboxComboContainer, "last");
                             this._checkboxesArr.push(checkboxNode);
                         } else {
+                            var columnCreated = false;
+                            //find or create a wrapper for this column
+                            if (itemIndex === 0) {
+                                if(this.checkboxComboContainer.children[colIndex]) {
+                                    columnWrapperDiv = this.checkboxComboContainer.children[colIndex];
+                                } else {
+                                    //make a new column
+                                    columnWrapperDiv = this._createColumnWrapperNode();
+                                    columnCreated = true;
+                                } 
+                            }
                             //an enclosing div element is required to vertically align a  in bootstrap.
-                            if (this.checkboxComboContainer.children[i]) {
-                                enclosingDivElement = this.checkboxComboContainer.children[i];
+                            if (columnWrapperDiv.children[itemIndex]) {
+                                enclosingDivElement = columnWrapperDiv.children[itemIndex];
                             } else {
                                 enclosingDivElement = dojoConstruct.create("div", {
                                     "class": "checkbox"
                                 });
                             }
                             dojoConstruct.place(labelNode, enclosingDivElement, "only");
-                            if (!this.checkboxComboContainer.children[i]) {
-                                dojoConstruct.place(enclosingDivElement, this.checkboxComboContainer, "last");
+                            if (!columnWrapperDiv.children[itemIndex]) {
+                                dojoConstruct.place(enclosingDivElement, columnWrapperDiv, "last");
                             }
                             this._checkboxesArr.push(enclosingDivElement);
+                            
+                            //be sure to place the wrapper
+                            if (columnCreated) {
+                                dojoConstruct.place(columnWrapperDiv, this.checkboxComboContainer, "last");
+                            }
+                            //increment or reset the column count and index
+                            itemIndex++;
+                            if(itemIndex >= this.itemsPerColumn) {
+                                //delete extra children in column (is this possible?)
+                                i = itemIndex;
+                                var columnSize = columnWrapperDiv.children.length;
+                                if (i > 0) {
+                                    for (i; i < columnSize; i++) {
+                                        dojoConstruct.destroy(columnWrapperDiv.children[i]);
+                                    }
+                                }
+                                //reset and increment for the new column
+                                itemIndex = 0;
+                                colIndex++;
+                            }
                         }
-
-                        i++;
                     }
                 }
-                j = i;
+                j = colIndex + 1;
+                nodelength = this.checkboxComboContainer.children.length;
                 if (j > 0) {
-                    for (j; j <= nodelength; j++) {
-                        dojoConstruct.destroy(this.checkboxComboContainer.children[i]);
+                    for (j; j < nodelength; j++) {
+                        dojoConstruct.destroy(this.checkboxComboContainer.children[j]);
                     }
                 }
 
@@ -481,6 +519,15 @@ define([
                 this._addOnclickToCheckboxItem(checkboxNode, key);
 
                 return checkboxNode;
+            },
+
+            _createColumnWrapperNode: function () {
+                var columnNode = null;
+
+                columnNode = dojoConstruct.create("div", {});
+                dojoClass.add(columnNode, "checkboxColumn");
+
+                return columnNode;
             },
 
             _addOnclickToCheckboxItem: function (checkboxNode, rbvalue) {

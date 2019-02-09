@@ -91,6 +91,11 @@
 				<enumerationValue key="vertical">Vertical</enumerationValue>
 			</enumerationValues>
 		</property>
+		<property key="itemsPerColumn" type="integer" defaultValue="0">
+			<caption>Items per column</caption>
+			<category>Display</category>
+			<description>(Vertical only) If this is larger than zero, the number of items shown per column. If zero, all items will go in one column.</description>
+		</property>
 		<property key="labelWidth" type="integer" defaultValue="4">
 			<caption>Label Width (weight)</caption>
 			<category>Display</category>

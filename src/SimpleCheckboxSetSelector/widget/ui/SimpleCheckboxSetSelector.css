@@ -11,3 +11,11 @@
 .checkboxMainContainer .showmore-hidden {
 	display: none;
 }
+
+.checkboxContainer {
+	display: flex
+}
+
+.checkboxColumn {
+	margin-right: 10px;
+}
