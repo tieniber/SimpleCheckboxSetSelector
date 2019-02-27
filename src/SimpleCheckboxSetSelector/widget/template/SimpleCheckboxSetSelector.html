@@ -1,6 +1,13 @@
 <div class="form-group checkboxMainContainer" data-dojo-attach-point="checkboxMainContainer">
 	<label class="control-label checkboxLabel" data-dojo-attach-point="checkboxLabel"></label>
-	<div class="checkboxContainer" data-dojo-attach-point="checkboxComboContainer">
+	<div class="checkboxContainerWrapper" data-dojo-attach-point="checkboxWrapper">
+		<div class="checkbox noselect" data-dojo-attach-point="selectAllNode">
+			<label>
+				<i data-dojo-attach-point="selectAllCheckbox"></i>
+				<span data-dojo-attach-point="selectAllText">Select All</span>
+			</label>
+		</div>
+		<div class="checkboxContainer" data-dojo-attach-point="checkboxComboContainer"></div>
 	</div>
 	<div class="showmoreButton" data-dojo-attach-point="showMoreButton">Show more</div>
 </div>

@@ -113,6 +113,12 @@ define([
                     this._isReadOnly = true;
                 }
 
+                //setup select all button listener
+                this.connect(this.selectAllNode, "onclick", this._onClickSelectAll);
+                //set base class on checkbox
+                if(this.classAlways) {
+                    dojoClass.add(this.selectAllCheckbox, this.classAlways); 
+                }           
             },
 
             /**
@@ -343,11 +349,20 @@ define([
                     dojoConstruct.empty(this.checkboxComboContainer);
                 }
 
+                if (!this.addSelectAll) {
+                    dojoClass.add(this.selectAllNode, "hidden");
+                }
+
                 for (var o = 0; o < this._checkboxOptionsArray.length; o++) {
                     var option = this._checkboxOptionsArray[o];
                     if (option.value) {
                         labelNode = this._createLabelNode(option.guid, option.value);
                         checkboxNode = this._createCheckboxNode(option.guid, option.value);
+                        if(this.iconCheckboxes) {
+                            this._addOnclickToCheckboxItem(checkboxNode, labelNode, option.guid);
+                        } else {
+                            this._addOnclickToCheckboxItem(checkboxNode, null, option.guid);
+                        }
 
                         dojoConstruct.place(checkboxNode, labelNode, "first");
 
@@ -409,6 +424,9 @@ define([
                         dojoConstruct.destroy(this.checkboxComboContainer.children[j]);
                     }
                 }
+
+                //validate status of select all box
+                this._updateSelectAllRendering();
 
                 // i is the number of checkboxes.
                 if (this.showMore > 0 && i > this.showMore) {
@@ -482,7 +500,8 @@ define([
                 }
 
                 spanNode = dojoConstruct.place(dojoConstruct.create("span", {
-                    "innerHTML": value
+                    "innerHTML": value,
+                    "class": "noselect"
                 }), labelNode);
 
                 return labelNode;
@@ -493,11 +512,22 @@ define([
                 var checkboxNode = null,
                     referencedObjects = this._contextObj.get(this._reference);
 
-                checkboxNode = dojoConstruct.create("input", {
-                    "type": "checkbox",
-                    "value": key,
-                    "id": this._reference + "_" + this.id + "_"
-                });
+                if (this.iconCheckboxes) {
+                    checkboxNode = dojoConstruct.create("i", {
+                        "value": key,
+                        "id": this._reference + "_" + this.id + "_"
+                    });
+                    if(this.classAlways) {
+                        dojoClass.add(checkboxNode, this.classAlways);            
+                    }
+                    this._iconRenderUnchecked(checkboxNode);
+                } else {
+                    checkboxNode = dojoConstruct.create("input", {
+                        "type": "checkbox",
+                        "value": key,
+                        "id": this._reference + "_" + this.id + "_"
+                    });
+                }
 
                 dojoAttr.set(checkboxNode, "name", "checkbox" + this._contextObj.getGuid() + "_" + this.id);
 
@@ -511,13 +541,14 @@ define([
                 if (referencedObjects !== null && referencedObjects !== "") {
                     dojoArray.forEach(referencedObjects, function (ref, i) {
                         if (checkboxNode.value === ref) {
-                            checkboxNode.checked = true;
+                            if(this.iconCheckboxes) {
+                                this._iconRenderChecked(checkboxNode);
+                            } else {
+                                checkboxNode.checked = true;
+                            }
                         }
                     }, this);
                 }
-
-                this._addOnclickToCheckboxItem(checkboxNode, key);
-
                 return checkboxNode;
             },
 
@@ -530,26 +561,49 @@ define([
                 return columnNode;
             },
 
-            _addOnclickToCheckboxItem: function (checkboxNode, rbvalue) {
+            _addOnclickToCheckboxItem: function (checkboxNode, labelNode, rbvalue) {
                 logger.debug(this.id + "._addOnclickToCheckboxItem");
 
-                this.connect(checkboxNode, "onclick", dojoLang.hitch(this, function () {
+                var onClick = function() {
 
                     if (this._isReadOnly ||
                         this._contextObj.isReadonlyAttr(this._reference)) {
                         return;
                     }
 
-                    if (checkboxNode.checked) {
+                    var isChecked = false;
+
+                    if (this.iconCheckboxes) {
+                        if(!this._iconIsChecked(checkboxNode)) {
+                            isChecked = true;
+                            this._iconRenderChecked(checkboxNode);
+                        } else {
+                            this._iconRenderUnchecked(checkboxNode);
+                        }
+                    } else {
+                        if (checkboxNode.checked) {
+                            isChecked = true;
+                        }
+                    }
+
+                    if (isChecked) {
                         this._contextObj.addReference(this._reference, rbvalue);
                     } else {
                         this._contextObj.removeReferences(this._reference, rbvalue);
                     }
 
+                    this._updateSelectAllRendering();
+
                     if (this.onChangeMicroflow) {
                         this._triggerOnChange();
                     }
-                }));
+                }.bind(this);
+
+                if(this.iconCheckboxes) {
+                    this.connect(labelNode, "onclick", onClick);
+                } else {
+                    this.connect(checkboxNode, "onclick", onClick);
+                }
             },
 
             onchangeTimeout: null,
@@ -565,6 +619,43 @@ define([
                     }), this.onChangeDelay);
                 } else {
                     this._execMF(this._contextObj, this.onChangeMicroflow);
+                }
+            },
+
+            _iconRenderChecked(iconNode) {
+                dojoClass.remove(iconNode, this.classWhenUnchecked);
+                dojoClass.add(iconNode, this.classWhenChecked);
+
+            },
+            _iconRenderUnchecked(iconNode) {
+                dojoClass.remove(iconNode, this.classWhenChecked);
+                dojoClass.add(iconNode, this.classWhenUnchecked);
+            },
+            _iconIsChecked(iconNode) {
+                return dojoClass.contains(iconNode, this.classWhenChecked);
+            },
+            _onClickSelectAll() {
+                var checked = this._iconIsChecked(this.selectAllCheckbox);
+                if(checked) {
+                    this._iconRenderUnchecked(this.selectAllCheckbox);
+                    this._contextObj.set(this._reference, []);
+                } else {
+                    this._iconRenderChecked(this.selectAllCheckbox);
+                    var allRefs = Object.getOwnPropertyNames(this._checkboxOptions);
+                    this._contextObj.set(this._reference, allRefs);
+                }
+
+                if (this.onChangeMicroflow) {
+                    this._triggerOnChange();
+                }
+            },
+
+            _updateSelectAllRendering() {
+                if(Object.getOwnPropertyNames(this._checkboxOptions).length === this._contextObj.get(this._reference).length) {
+                    this._iconRenderChecked(this.selectAllCheckbox);
+                } else {
+                    this._iconRenderUnchecked(this.selectAllCheckbox);
+
                 }
             },
 

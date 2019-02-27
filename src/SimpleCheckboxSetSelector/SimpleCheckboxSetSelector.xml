@@ -111,17 +111,37 @@
 			<category>Display</category>
 			<description>This will sort the checkboxes based on the checked value. All items that are checked, will be placed first</description>
 		</property>
-		<!-- TODO
+
 		<property key="addSelectAll" type="boolean" defaultValue="true">
 			<caption>Add Select All</caption>
 			<category>Display</category>
 			<description>Add a 'Select All' checkbox at the top of the option list</description>
 		</property>
-			-->
+
 		<property key="readonly" type="boolean" defaultValue="false">
 			<caption>Read only</caption>
 			<category>Display</category>
 			<description>The checkboxes are read only if selected</description>
+		</property>
+		<property key="iconCheckboxes" type="boolean" defaultValue="false">
+			<caption>Icon Checkboxes</caption>
+			<category>Display</category>
+			<description>If selected, the checkboxes are rendered as icons instead of regular checkbox inputs.</description>
+		</property>
+		<property key="classAlways" type="string" required="false" defaultValue="glyphicon">
+			<caption>Icon class</caption>
+			<category>Display</category>
+			<description>Classes that need to be on the checkboxes all the time (like glyphicon or fa)</description>
+		</property>		
+		<property key="classWhenChecked" type="string" required="false" defaultValue="glyphicon-check">
+			<caption>Icon when checked</caption>
+			<category>Display</category>
+			<description>Classes to add to the icon when checked (default: glyphicon glyphicon-check)</description>
+		</property>
+		<property key="classWhenUnchecked" type="string" required="false" defaultValue="glyphicon-unchecked">
+			<caption>Icon when unchecked</caption>
+			<category>Display</category>
+			<description>Classes to add to the icon when not checked (default: glyphicon glyphicon-unchecked)</description>
 		</property>
 		<property key="onChangeMicroflow" type="microflow" required="false">
 			<caption>On change</caption>

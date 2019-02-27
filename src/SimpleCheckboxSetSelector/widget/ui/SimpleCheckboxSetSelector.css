@@ -12,10 +12,18 @@
 	display: none;
 }
 
-.checkboxContainer {
+.checkboxMainContainer .checkboxContainer {
 	display: flex
 }
 
-.checkboxColumn {
+.checkboxMainContainer .checkboxColumn {
 	margin-right: 10px;
+}
+
+.checkboxMainContainer i + span {
+	margin-left:5px;
+}
+
+.checkboxMainContainer .noselect {
+	user-select: none;
 }
