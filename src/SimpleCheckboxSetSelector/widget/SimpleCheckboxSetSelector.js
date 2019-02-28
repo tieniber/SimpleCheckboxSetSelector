@@ -252,7 +252,7 @@ define([
                     mx.data.get({
                         xpath: "//" + this._entity + this.constraint.replace(/\[%CurrentObject%\]/g, this._contextObj.getGuid()),
                         filter: {
-                            limit: 50,
+                            limit: 1000,
                             depth: 0,
                             sort: [
                                 [this.sortAttr, this.sortOrder]
@@ -633,7 +633,6 @@ define([
             },
             _iconIsChecked(iconNode) {
                 return dojoClass.contains(iconNode, this.classWhenChecked);
-                
             },
             _onClickSelectAll() {
                 var checked = this._iconIsChecked(this.selectAllCheckbox);
