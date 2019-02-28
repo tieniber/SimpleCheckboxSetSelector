@@ -285,10 +285,11 @@ define([
                     var mxObj = objs[i];
                     this._checkboxOptions[mxObj.getGuid()] = mxObj.get(this.displayAttribute);
 
+                    var value = mxObj.isEnum(this.displayAttribute) ? mxObj.getEnumCaption(this.displayAttribute) : mxObj.get(this.displayAttribute)
                     var checkboxObj = {
                         //i: i,
                         guid: mxObj.getGuid(),
-                        value: mxObj.get(this.displayAttribute),
+                        value: value,
                         checked: false
                     };
 

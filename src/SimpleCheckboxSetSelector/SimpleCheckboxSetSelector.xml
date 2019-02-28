@@ -71,6 +71,7 @@
 			<description>The display attribute of the checkbox option.</description>
 			<attributeTypes>
 				<attributeType name="String" />
+				<attributeType name="Enum" />
 			</attributeTypes>
 		</property>
 		<property key="formOrientation" type="enumeration" defaultValue="horizontal">
