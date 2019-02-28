@@ -325,7 +325,6 @@ define([
                 this._updateRendering();
             },
 
-
             _createCheckboxNodes: function (mxObjArr) {
                 logger.debug(this.id + "._createCheckboxNodes");
                 var mxObj = null,
