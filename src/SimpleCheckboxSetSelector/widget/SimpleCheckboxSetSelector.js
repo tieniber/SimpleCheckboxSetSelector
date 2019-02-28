@@ -633,6 +633,7 @@ define([
             },
             _iconIsChecked(iconNode) {
                 return dojoClass.contains(iconNode, this.classWhenChecked);
+                
             },
             _onClickSelectAll() {
                 var checked = this._iconIsChecked(this.selectAllCheckbox);
