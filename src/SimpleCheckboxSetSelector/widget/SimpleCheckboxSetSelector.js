@@ -635,6 +635,9 @@ define([
                 return dojoClass.contains(iconNode, this.classWhenChecked);
             },
             _onClickSelectAll() {
+                if(this.selectAllNode.attributes.disabled) {
+                    return;
+                }
                 var checked = this._iconIsChecked(this.selectAllCheckbox);
                 if(checked) {
                     this._iconRenderUnchecked(this.selectAllCheckbox);
@@ -655,7 +658,12 @@ define([
                     this._iconRenderChecked(this.selectAllCheckbox);
                 } else {
                     this._iconRenderUnchecked(this.selectAllCheckbox);
+                }
 
+                if (this._isReadOnly ||
+                    this._contextObj.isReadonlyAttr(this._reference)) {
+                    dojoAttr.set(this.selectAllNode, "disabled", "disabled");
+                    dojoAttr.set(this.selectAllNode, "readonly", "readonly");
                 }
             },
 

@@ -27,3 +27,11 @@
 .checkboxMainContainer .noselect {
 	user-select: none;
 }
+
+.checkboxMainContainer *[disabled="disabled"] {
+	cursor: not-allowed;
+}
+
+.checkboxMainContainer *[disabled="disabled"] * {
+	cursor: not-allowed;
+}
